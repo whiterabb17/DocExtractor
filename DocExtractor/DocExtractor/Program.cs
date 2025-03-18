@@ -10,8 +10,19 @@ namespace DocExtractor
             if (args.Length == 0)
             {
                 Console.WriteLine("No file was provided...\nAttempting to Extract all '.docx' files in current directory");
-                args = System.IO.Directory.GetFiles(System.IO.Directory.GetCurrentDirectory(), "*.docx");
-                args += System.IO.Directory.GetFiles(System.IO.Directory.GetCurrentDirectory(), "*.doc");
+                var __argsx = System.IO.Directory.GetFiles(System.IO.Directory.GetCurrentDirectory(), "*.docx");
+                string[] argsx = { };
+                var __args = System.IO.Directory.GetFiles(System.IO.Directory.GetCurrentDirectory(), "*.doc");
+                foreach (string _argx in __argsx)
+                {
+                    if (!_argx.Contains("extracted"))
+                        ExtractBetweenParagraphs(new string[] { _argx });
+                }
+                foreach (string _args in __args)
+                { 
+                    if (!_args.Contains("extracted"))
+                        ExtractBetweenParagraphs(new string[] { _args });
+                }
             }
             ExtractBetweenParagraphs(args);
             Console.WriteLine("\n\n [!] Extraction complete!");
@@ -34,9 +45,11 @@ namespace DocExtractor
 
                 // Insert the content into a new document and save it to disk.
                 Document dstDoc = text_extraction_helper.GenerateDocument(doc, extractedNodes);
-                dstDoc.Save($"extracted-{file.Split("\\").Last()}");
+                Console.WriteLine("Would you like to save to a new document? (y/n)");
+                var response = Console.ReadLine();
+                if (response.ToLower() == "y")
+                    dstDoc.Save($"extracted-{file.Split("\\").Last()}");
             }
-            
         }
     }
 }

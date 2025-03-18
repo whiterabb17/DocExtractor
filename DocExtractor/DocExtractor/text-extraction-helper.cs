@@ -161,8 +161,17 @@ namespace DocExtractor
 
             foreach (Node node in nodes)
             {
-                Node importNode = importer.ImportNode(node, true);
-                dstDoc.FirstSection.Body.AppendChild(importNode);
+                var text = node.GetText();
+                if (text.Contains("Created with an evaluation") || node.GetText().Contains("Evaluation Only"))
+                {
+                    // DO NOTHING - SKIP NODE TEXT
+                }
+                else
+                {
+                    Console.WriteLine(node.GetText());
+                    Node importNode = importer.ImportNode(node, true);
+                    dstDoc.FirstSection.Body.AppendChild(importNode);
+                }
             }
 
             // Return the generated document.
