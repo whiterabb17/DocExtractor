@@ -1,4 +1,5 @@
 ﻿using Aspose.Words;
+using Aspose.Words.Vba;
 using System.Collections;
 
 namespace DocExtractor
@@ -45,6 +46,8 @@ namespace DocExtractor
 
                 // Insert the content into a new document and save it to disk.
                 Document dstDoc = text_extraction_helper.GenerateDocument(doc, extractedNodes);
+                var macros = extract_macros.GetMacrosFromDoc(file);
+                Console.WriteLine($"Extracted Macros:\n{macros}");
                 Console.WriteLine("Would you like to save to a new document? (y/n)");
                 var response = Console.ReadLine();
                 if (response.ToLower() == "y")
