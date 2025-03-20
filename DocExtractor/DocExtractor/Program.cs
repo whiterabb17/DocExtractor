@@ -1,5 +1,4 @@
 ﻿using Aspose.Words;
-using Aspose.Words.Vba;
 using System.Collections;
 
 namespace DocExtractor
@@ -34,6 +33,9 @@ namespace DocExtractor
         {
             foreach (var file in files)
             {
+
+                //string tempdoc = $"temp{file.Split("\\").Last()}";
+                //File.Copy(file, tempdoc);
                 Console.WriteLine($"Extracting content from {file}...\n\n");
                 Document doc = new Document(file);
 
@@ -46,19 +48,40 @@ namespace DocExtractor
 
                 // Insert the content into a new document and save it to disk.
                 Document dstDoc = text_extraction_helper.GenerateDocument(doc, extractedNodes);
-                var macros = extract_macros.GetMacrosFromDoc(file);
-                if (macros.Count > 0)
-                {
-                    File.WriteAllLines($"extracted-macros-{file.Split("\\").Last().Replace("docx","txt").Replace("doc", "txt")}", macros);
-                    Console.WriteLine($"Extracted Macros:\nWritten to: extracted-{file.Split("\\").Last().Replace("docx", "txt").Replace("doc", "txt")}\n\nContent:\n{macros}");
-                }
+
                 Console.WriteLine("Would you like to save to a new document? (y/n)");
                 var response = Console.ReadLine();
                 if (response.ToLower() == "y")
                     dstDoc.Save($"extracted-{file.Split("\\").Last()}");
-                Console.WriteLine("Extraction Processes Complete");
-                Console.ReadLine();
+                dstDoc.Cleanup();
+#if !DEBUG && !RELEAE
+                Console.WriteLine("Would you like to attempt to remove macros? (y/n)");
+                var ans = Console.ReadLine();
+                if (ans.ToLower() == "y")
+                { 
+                    try
+                    {
+                        //var tempfile = File.ReadAllBytes(file);
+                        //File.WriteAllBytes($"tempmacro.{file.Split(".").Last()}", tempfile);
+                        var macros = extract_macros.GetMacrosFromDoc(tempdoc);
+                        if (macros.Count > 0)
+                        {
+                            File.WriteAllLines($"extracted-macros-{file.Split("\\").Last().Replace("docx", "txt").Replace("doc", "txt")}", macros);
+                            Console.WriteLine($"Extracted Macros:\nWritten to: extracted-{file.Split("\\").Last().Replace("docx", "txt").Replace("doc", "txt")}\n\nContent:\n{macros}");
+                        }
+                        //File.Delete($"tempmacro.{file.Split(".").Last()}");
+                    }
+                    catch (Exception ex)
+                    {
+                        Console.WriteLine($"ERROR: {ex.Message}");
+                        File.Delete($"tempmacro.{file.Split(".").Last()}");
+                    }
+                }
+#endif
+                //File.Delete(tempdoc);
             }
+            Console.WriteLine("Extraction Processes Complete");
+            Console.ReadLine();
         }
     }
 }
